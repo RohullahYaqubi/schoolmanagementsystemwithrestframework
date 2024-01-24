@@ -4,12 +4,12 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser
 from rest_framework import status
-from .serializers import StudentsSerializer, ClassNameSerializer, TeacherSerializer
+from .serializers import StudentsSerializer, ClassNameSerializer, TeacherSerializer, ClassNameRetriveSerializer
 from .models import Student, NameOfClass, Teacher
 
 
 class TeacherViewSet(ModelViewSet):
-    queryset = Teacher.objects.all()
+    queryset = Teacher.objects.select_related('name_of_class').all()
     serializer_class = TeacherSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['name_of_class']
@@ -27,9 +27,14 @@ class TeacherViewSet(ModelViewSet):
 
 
 class NameOfClassViewset(ModelViewSet):
-    queryset = NameOfClass.objects.all()
-    serializer_class = ClassNameSerializer
+    queryset = NameOfClass.objects.prefetch_related('student').all()
 
+    
+    def get_serializer_class(self):
+
+        if self.action == 'retrieve':
+            return ClassNameRetriveSerializer
+        return ClassNameSerializer
 
     def destroy(self, request, pk):
         class_name = get_object_or_404(NameOfClass, pk=pk)
@@ -49,12 +54,6 @@ class StudentsViewSet(ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['class_name']
 
-
-    def perform_create(self, serializer):
-        instance = serializer.save()
-        class_name = instance.class_name
-        class_name.number_of_students += 1
-        class_name.save()
 
 
 

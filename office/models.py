@@ -24,7 +24,6 @@ class Student(models.Model):
 class NameOfClass(models.Model):
     name = models.CharField(max_length=255)
     teacher = models.OneToOneField("Teacher", on_delete=models.PROTECT, related_name='name_of_class')
-    number_of_students = models.PositiveSmallIntegerField()
 
     def __str__(self) -> str:
         return self.name
