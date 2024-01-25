@@ -2,9 +2,8 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
-from rest_framework.permissions import IsAdminUser
 from rest_framework import status
-from .serializers import StudentsSerializer, ClassNameSerializer, TeacherSerializer, ClassNameRetriveSerializer
+from .serializers import StudentsSerializer, ClassNameSerializer, TeacherSerializer, ClassNameRetrieveSerializer
 from .models import Student, NameOfClass, Teacher
 
 
@@ -29,13 +28,20 @@ class TeacherViewSet(ModelViewSet):
 class NameOfClassViewset(ModelViewSet):
     queryset = NameOfClass.objects.prefetch_related('student').all()
 
-    
     def get_serializer_class(self):
 
         if self.action == 'retrieve':
-            return ClassNameRetriveSerializer
+            return ClassNameRetrieveSerializer
         return ClassNameSerializer
-
+    
+    def get_serializer_context(self):
+        if self.action == 'retrieve':
+            class_name = get_object_or_404(NameOfClass, pk = self.kwargs.get('pk'))
+            students_in_class = Student.objects.filter(class_name=class_name)
+            return {'students_in_class':students_in_class}
+        else:
+            return {'class_names':self.queryset}
+        
     def destroy(self, request, pk):
         class_name = get_object_or_404(NameOfClass, pk=pk)
         try:
@@ -47,18 +53,8 @@ class NameOfClassViewset(ModelViewSet):
             return Response('Deleted', status=status.HTTP_204_NO_CONTENT)
 
 
-
 class StudentsViewSet(ModelViewSet):
     queryset = Student.objects.select_related('class_name').all()
     serializer_class = StudentsSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['class_name']
-
-
-
-
-
-
-
-
-

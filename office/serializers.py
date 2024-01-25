@@ -8,11 +8,18 @@ class SimpleStudentSerializer(serializers.ModelSerializer):
         fields = ['student_id', 'name']
 
 
-class ClassNameRetriveSerializer(serializers.ModelSerializer):
+class ClassNameRetrieveSerializer(serializers.ModelSerializer):
     student = SimpleStudentSerializer(many=True)
+    number_of_students = serializers.SerializerMethodField()
     class Meta:
         model = NameOfClass
-        fields = ['id','name', 'teacher','student']
+        fields = ['id', 'name', 'teacher', 'number_of_students', 'student']
+
+    def get_number_of_students(self, instance):
+        students = self.context['students_in_class']
+        number_of_students = students.count()
+
+        return number_of_students
 
 
 class StudentsSerializer(serializers.ModelSerializer):
@@ -22,10 +29,14 @@ class StudentsSerializer(serializers.ModelSerializer):
 
 
 class ClassNameSerializer(serializers.ModelSerializer):
-    
+    number_of_students = serializers.SerializerMethodField()
     class Meta:
         model = NameOfClass
-        fields = ['id','name', 'teacher']
+        fields = ['id', 'name', 'teacher', 'number_of_students']
+
+    def get_number_of_students(self, obj):
+        number_of_students = obj.student.count()
+        return number_of_students
 
 
 
