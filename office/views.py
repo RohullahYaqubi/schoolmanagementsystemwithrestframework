@@ -24,9 +24,13 @@ class TeacherViewSet(ModelViewSet):
             return Response('Deleted', status=status.HTTP_204_NO_CONTENT)
         
 
-
+ 
 class NameOfClassViewset(ModelViewSet):
+    http_method_names = ['get','post', 'put', 'delete', 'head', 'options']
     queryset = NameOfClass.objects.prefetch_related('student').all()
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['teacher']
+
 
     def get_serializer_class(self):
 
@@ -54,7 +58,11 @@ class NameOfClassViewset(ModelViewSet):
 
 
 class StudentsViewSet(ModelViewSet):
+    http_method_names = ['get','post', 'put', 'head', 'options']
     queryset = Student.objects.select_related('class_name').all()
     serializer_class = StudentsSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['class_name']
+    filterset_fields = ['class_name', 'status']
+
+
+

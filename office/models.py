@@ -10,12 +10,21 @@ class Teacher(models.Model):
         return f'{self.name} {self.last_name}'
 
 class Student(models.Model):
+
+    STATUS_ACTIVE = 'A'
+    STATUS_INACTIVE = 'I'
+    ACTIVE_STATUS = [
+        (STATUS_ACTIVE, 'ACTIVE'),
+        (STATUS_INACTIVE, 'INACTIVE')
+    ]
     student_id = models.AutoField(primary_key = True)
     name = models.CharField(max_length=255)
     father_name = models.CharField(max_length=255)
     grandfather_name = models.CharField(max_length=255)
     number_of_tazkira = models.PositiveIntegerField(blank=True)
+    status = models.CharField(max_length=1, choices=ACTIVE_STATUS, default=STATUS_ACTIVE, null=False )
     class_name = models.ForeignKey("NameOfClass", on_delete=models.PROTECT, related_name='student')
+
 
     def __str__(self) -> str:
         return f'{self.name} {self.father_name}'

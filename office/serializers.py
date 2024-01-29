@@ -25,7 +25,7 @@ class ClassNameRetrieveSerializer(serializers.ModelSerializer):
 class StudentsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
-        fields = ['student_id', 'name', 'father_name', 'grandfather_name', 'number_of_tazkira', 'class_name']
+        fields = ['student_id', 'name', 'father_name', 'grandfather_name', 'number_of_tazkira', 'class_name', 'status']
 
 
 class ClassNameSerializer(serializers.ModelSerializer):
