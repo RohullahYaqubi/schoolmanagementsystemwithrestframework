@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Student, NameOfClass, Teacher
+from .models import Student, NameOfClass, Teacher, Attendence
 
 
 class SimpleStudentSerializer(serializers.ModelSerializer):
@@ -48,5 +48,8 @@ class TeacherSerializer(serializers.ModelSerializer):
 
 
 
-
+class AttendenceSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = Attendence
+        fields = ['id', 'student', 'date','attendence_status']
 

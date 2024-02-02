@@ -3,8 +3,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import StudentsSerializer, ClassNameSerializer, TeacherSerializer, ClassNameRetrieveSerializer
-from .models import Student, NameOfClass, Teacher
+from .serializers import StudentsSerializer, ClassNameSerializer, TeacherSerializer, ClassNameRetrieveSerializer, AttendenceSerializers
+from .models import Student, NameOfClass, Teacher, Attendence
 
 
 class TeacherViewSet(ModelViewSet):
@@ -65,4 +65,7 @@ class StudentsViewSet(ModelViewSet):
     filterset_fields = ['class_name', 'status']
 
 
+class AttendenceViewSet(ModelViewSet):
+    queryset = Attendence.objects.all()
+    serializer_class = AttendenceSerializers
 
