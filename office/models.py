@@ -46,7 +46,7 @@ class Attendence(models.Model):
         (ATTENDENCE_STATUS_ABSENT, 'ABSENT')
     ]
     student = models.ForeignKey(Student, on_delete=models.PROTECT)
-    date = models.DateTimeField(auto_now_add=True)
+    date = models.DateField(auto_now_add=True)
     attendence_status = models.CharField(max_length=1, choices=ATTENDENCE_STATUS,
                                           default=ATTENDENCE_STATUS_ABSENT)
     

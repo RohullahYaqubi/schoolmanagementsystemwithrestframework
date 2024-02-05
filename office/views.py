@@ -66,6 +66,13 @@ class StudentsViewSet(ModelViewSet):
 
 
 class AttendenceViewSet(ModelViewSet):
-    queryset = Attendence.objects.all()
     serializer_class = AttendenceSerializers
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['date']
+
+    def get_queryset(self):
+        queryset = Attendence.objects.filter(student_id = self.kwargs['students_pk'])
+        return queryset
+        
+    
 
