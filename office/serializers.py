@@ -53,3 +53,10 @@ class AttendenceSerializers(serializers.ModelSerializer):
         model = Attendence
         fields = ['id', 'student', 'date','attendence_status']
 
+
+class AttendenceCreateSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = Attendence
+        fields = ['student','attendence_status']
+
+

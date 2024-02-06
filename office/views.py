@@ -1,9 +1,11 @@
 from django.shortcuts import get_object_or_404
+from django.http import QueryDict
+from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import StudentsSerializer, ClassNameSerializer, TeacherSerializer, ClassNameRetrieveSerializer, AttendenceSerializers
+from .serializers import StudentsSerializer, ClassNameSerializer, TeacherSerializer, ClassNameRetrieveSerializer, AttendenceSerializers, AttendenceCreateSerializers
 from .models import Student, NameOfClass, Teacher, Attendence
 
 
@@ -16,7 +18,7 @@ class TeacherViewSet(ModelViewSet):
     def destroy(self, request, pk):
         teacher = get_object_or_404(Teacher, pk=pk)
         try:
-            class_name = NameOfClass.objects.get(teacher=teacher.employee_id)
+            class_name = NameOfClass.objects.filter(teacher=teacher.employee_id)
             return Response('This teacher cannot be deleted because he is associated with a class_lesson. To delete his record, please remove him from the territory of the class.',
                             status=status.HTTP_405_METHOD_NOT_ALLOWED)
         except NameOfClass.DoesNotExist:
@@ -66,13 +68,41 @@ class StudentsViewSet(ModelViewSet):
 
 
 class AttendenceViewSet(ModelViewSet):
-    serializer_class = AttendenceSerializers
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['date']
 
     def get_queryset(self):
         queryset = Attendence.objects.filter(student_id = self.kwargs['students_pk'])
         return queryset
+    
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return AttendenceCreateSerializers
+        return AttendenceSerializers
+       
+    def create(self, request, *args, **kwargs):
+        student_id = self.kwargs['students_pk']
+        curent_date = timezone.now()
+        attendence_date = curent_date.date()
+        print(attendence_date)
+        try:
+            existing_attendence = Attendence.objects.get(student=student_id, date=attendence_date)
+            print(existing_attendence)
+            return Response('This student already has an attendance for the given date', status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        except Attendence.DoesNotExist:
+
+            data = QueryDict(request.data.urlencode(), mutable=True)
+            data['student'] = student_id
+            serializer = self.get_serializer(data=data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+
+    
+
+    
+
         
     
 
