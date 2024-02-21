@@ -53,12 +53,28 @@ class Attendence(models.Model):
 
 
 class ResultsOfOneYear(models.Model):
+    MID_TERM = 'M'
+    LAST_TERM = 'L'
+    TERM = [
+        (MID_TERM, 'MID TERM'),
+        (LAST_TERM, 'LAST TERM')
+    ]
     student = models.ForeignKey(Student,on_delete=models.PROTECT)
-    class_name = models.ForeignKey(NameOfClass, on_delete=models.PROTECT)
-    teacher = models.ForeignKey(Teacher, on_delete=models.PROTECT)
+    class_name = models.CharField(max_length=255)
+    term = models.CharField(max_length=1, choices=TERM, default=MID_TERM)
+    date_created = models.DateField(auto_now_add=True)
     maths = models.PositiveSmallIntegerField()
     litriture = models.PositiveSmallIntegerField()
     physics = models.PositiveSmallIntegerField()
     geology = models.PositiveSmallIntegerField()
     chemistry = models.PositiveIntegerField()
     total_number = models.PositiveIntegerField()
+    percentage = models.PositiveSmallIntegerField(null=True)
+
+    def save(self, *args, **kwargs):
+        self.total_number = self.maths + self.litriture + self.physics + self.geology + self.chemistry
+        self.percentage = (self.total_number / 500) * 100
+        self.class_name = self.student.class_name
+        super().save(*args, **kwargs)
+
+

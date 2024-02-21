@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Student, NameOfClass, Teacher, Attendence
+from .models import Student, NameOfClass, Teacher, Attendence, ResultsOfOneYear
 
 
 class SimpleStudentSerializer(serializers.ModelSerializer):
@@ -60,3 +60,13 @@ class AttendenceCreateSerializers(serializers.ModelSerializer):
         fields = ['student','attendence_status']
 
 
+class ResultsOfStudentSerializer(serializers.ModelSerializer): 
+    class Meta:
+        model = ResultsOfOneYear
+        fields = ['id', 'student', 'class_name', 'date_created', 'term', 'maths', 'litriture', 'physics', 'geology', 'chemistry', 'total_number', 'percentage']
+
+
+class CreateResultsOfStudentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ResultsOfOneYear
+        fields = ['id', 'student', 'term', 'maths', 'litriture', 'physics', 'geology', 'chemistry']

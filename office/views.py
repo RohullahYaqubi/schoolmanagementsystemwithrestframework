@@ -5,8 +5,15 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import StudentsSerializer, ClassNameSerializer, TeacherSerializer, ClassNameRetrieveSerializer, AttendenceSerializers, AttendenceCreateSerializers
-from .models import Student, NameOfClass, Teacher, Attendence
+from .serializers import (StudentsSerializer, 
+                          ClassNameSerializer, 
+                          TeacherSerializer,
+                           ClassNameRetrieveSerializer, 
+                           AttendenceSerializers, 
+                           AttendenceCreateSerializers,
+                           ResultsOfStudentSerializer,
+                           CreateResultsOfStudentSerializer)
+from .models import Student, NameOfClass, Teacher, Attendence, ResultsOfOneYear
 
 
 class TeacherViewSet(ModelViewSet):
@@ -97,6 +104,18 @@ class AttendenceViewSet(ModelViewSet):
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+
+class ResultsOfStudentsViewSet(ModelViewSet):
+
+    def get_queryset(self):
+        queryset = ResultsOfOneYear.objects.filter(student = self.kwargs['student_pk'])
+        return queryset
+    
+    def get_serializer_class(self):
+        if self.request.method == 'POST' or self.request.method == 'PUT':
+            return CreateResultsOfStudentSerializer
+        return ResultsOfStudentSerializer
         
 
     
