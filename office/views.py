@@ -111,6 +111,7 @@ class AttendenceViewSet(ModelViewSet):
         
 
 class ResultsOfStudentsViewSet(ModelViewSet):
+    http_method_names = ['get','post', 'patch', 'head', 'options']
 
     def get_queryset(self):
         queryset = ResultsOfOneYear.objects.filter(student = self.kwargs['student_pk'])
@@ -118,7 +119,7 @@ class ResultsOfStudentsViewSet(ModelViewSet):
 
 
     def get_serializer_class(self):
-        if self.request.method == 'POST' or self.request.method == 'PUT':
+        if self.request.method == 'POST' or self.request.method == 'PATCH':
             return CreateResultsOfStudentSerializer
         return ResultsOfStudentSerializer
 

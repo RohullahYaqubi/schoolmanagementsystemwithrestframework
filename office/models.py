@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import MaxValueValidator
 
 class Teacher(models.Model):
     employee_id = models.AutoField(primary_key=True)
@@ -66,18 +67,20 @@ class ResultsOfOneYear(models.Model):
     class_name = models.CharField(max_length=255)
     term = models.CharField(max_length=1, choices=TERM, default=MID_TERM)
     date_created = models.DateField(auto_now_add=True)
-    maths = models.PositiveSmallIntegerField()
-    litriture = models.PositiveSmallIntegerField()
-    physics = models.PositiveSmallIntegerField()
-    geology = models.PositiveSmallIntegerField()
-    chemistry = models.PositiveIntegerField()
-    total_number = models.PositiveIntegerField()
+    maths = models.PositiveSmallIntegerField(null=True, validators=[MaxValueValidator(100)])
+    litriture = models.PositiveSmallIntegerField(null=True, validators=[MaxValueValidator(100)])
+    physics = models.PositiveSmallIntegerField(null=True, validators=[MaxValueValidator(100)])
+    geology = models.PositiveSmallIntegerField(null=True, validators=[MaxValueValidator(100)])
+    chemistry = models.PositiveSmallIntegerField(null=True, validators=[MaxValueValidator(100)])
+    edification = models.PositiveSmallIntegerField(null=True, validators=[MaxValueValidator(100)])
+    total_number = models.PositiveIntegerField(null=True)
     percentage = models.PositiveSmallIntegerField(null=True)
+    
 
     def save(self, *args, **kwargs):
-        self.total_number = self.maths + self.litriture + self.physics + self.geology + self.chemistry
-        self.percentage = (self.total_number / 500) * 100
-        self.class_name = self.student.class_name
+        self.total_number = self.maths + self.litriture + self.physics + self.geology + self.chemistry + self.edification
+        self.percentage = (self.total_number / 600) * 100
+        self.class_name = str(self.student.class_name)
         super().save(*args, **kwargs)
 
 

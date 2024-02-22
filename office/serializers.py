@@ -60,13 +60,35 @@ class AttendenceCreateSerializers(serializers.ModelSerializer):
         fields = ['student','attendence_status']
 
 
+def getting_students_group(percentage):
+    if percentage >=90:
+        return 'A+'
+    elif percentage >=80:
+        return 'B'
+    elif percentage >= 70:
+        return 'C'
+    else: 
+        return 'F'
+    
+
 class ResultsOfStudentSerializer(serializers.ModelSerializer): 
+    group = serializers.SerializerMethodField()
     class Meta:
         model = ResultsOfOneYear
-        fields = ['id', 'student', 'class_name', 'date_created', 'term', 'maths', 'litriture', 'physics', 'geology', 'chemistry', 'total_number', 'percentage']
+        fields = ['id', 'student', 'class_name', 'date_created', 'term', 'maths', 'litriture', 'physics', 'geology', 'chemistry', 'edification', 'total_number', 'percentage', 'group']
 
+    def get_group(self, obj):
+        percentage = obj.percentage
+        if percentage >=90:
+            return 'A'
+        elif percentage >=80:
+            return 'B'
+        elif percentage >= 70:
+            return 'C'
+        else:
+            return 'F'
 
 class CreateResultsOfStudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = ResultsOfOneYear
-        fields = ['id', 'student', 'term', 'maths', 'litriture', 'physics', 'geology', 'chemistry']
+        fields = ['id', 'student', 'term', 'maths', 'litriture', 'physics', 'geology', 'chemistry', 'edification']
