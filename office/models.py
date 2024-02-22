@@ -74,7 +74,7 @@ class ResultsOfOneYear(models.Model):
     chemistry = models.PositiveSmallIntegerField(null=True, validators=[MaxValueValidator(100)])
     edification = models.PositiveSmallIntegerField(null=True, validators=[MaxValueValidator(100)])
     total_number = models.PositiveIntegerField(null=True)
-    percentage = models.PositiveSmallIntegerField(null=True)
+    percentage = models.FloatField(null=True, validators=[MaxValueValidator(100)])
     
 
     def save(self, *args, **kwargs):
