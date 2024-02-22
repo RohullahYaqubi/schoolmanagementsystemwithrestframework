@@ -84,3 +84,47 @@ class ResultsOfOneYear(models.Model):
         super().save(*args, **kwargs)
 
 
+        def __str__(self) -> str:
+            return self.student
+
+
+
+class FeesOfStudents(models.Model):
+    PAYMENT_STATUS_UNPAID = 'U'
+    PAYMENT_STATUS_PAID = 'P'
+    PAYMENT_STATUS = [
+        (PAYMENT_STATUS_UNPAID, 'UNPAID'),
+        (PAYMENT_STATUS_PAID, 'PAID')
+    ]
+
+    FEE_TYPE_GUARD = 'G'
+    FEE_TYPE_FIRST_EXAMS = 'FREX'
+    FEE_TYPE_SECOND_EXAMS = 'SCEX'
+    FEE_TYPE_MONTHLY_FEES = 'MF'
+    FEE_TYPE_FIRST_KANKOR = 'FRK'
+    FEE_TYPE_SECOND_KANKOR = 'SEK'
+
+    FEES_TYPE = [
+        (FEE_TYPE_GUARD, 'GUARD'),
+        (FEE_TYPE_FIRST_EXAMS, 'FIRST EXAMS'),
+        (FEE_TYPE_SECOND_EXAMS, 'SECOND_EXAMS'),
+        (FEE_TYPE_MONTHLY_FEES, 'MONTHLY_FEES'),
+        (FEE_TYPE_FIRST_KANKOR, 'FIRST_KANKOR'),
+        (FEE_TYPE_SECOND_KANKOR, 'SECOND_KANKOR'),
+    ]
+
+    
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    class_name = models.CharField(max_length=255)
+    fees_type = models.CharField(max_length=4, choices=FEES_TYPE, default=FEE_TYPE_MONTHLY_FEES)
+    amount_paid = models.PositiveSmallIntegerField()
+    amount_to_pay = models.PositiveSmallIntegerField()
+    date_of_payment = models.DateField(auto_now_add=True)
+    payment_status = models.CharField(max_length=1, choices=PAYMENT_STATUS, default=PAYMENT_STATUS_UNPAID)
+
+    def __str__(self) -> str:
+        return self.student
+
+
+
+
