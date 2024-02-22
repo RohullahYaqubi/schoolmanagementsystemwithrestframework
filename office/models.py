@@ -50,6 +50,9 @@ class Attendence(models.Model):
     attendence_status = models.CharField(max_length=1, choices=ATTENDENCE_STATUS,
                                           default=ATTENDENCE_STATUS_ABSENT)
     
+    def __str__(self) -> str:
+        return str(self.student)
+    
 
 
 class ResultsOfOneYear(models.Model):

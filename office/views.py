@@ -78,26 +78,30 @@ class AttendenceViewSet(ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['date']
 
+    
     def get_queryset(self):
         queryset = Attendence.objects.filter(student_id = self.kwargs['students_pk'])
         return queryset
+    
     
     def get_serializer_class(self):
         if self.request.method == 'POST':
             return AttendenceCreateSerializers
         return AttendenceSerializers
        
+    
     def create(self, request, *args, **kwargs):
         student_id = self.kwargs['students_pk']
         curent_date = timezone.now()
         attendence_date = curent_date.date()
         print(attendence_date)
+        
         try:
             existing_attendence = Attendence.objects.get(student=student_id, date=attendence_date)
             print(existing_attendence)
             return Response('This student already has an attendance for the given date', status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        
         except Attendence.DoesNotExist:
-
             data = QueryDict(request.data.urlencode(), mutable=True)
             data['student'] = student_id
             serializer = self.get_serializer(data=data)
@@ -111,11 +115,33 @@ class ResultsOfStudentsViewSet(ModelViewSet):
     def get_queryset(self):
         queryset = ResultsOfOneYear.objects.filter(student = self.kwargs['student_pk'])
         return queryset
-    
+
+
     def get_serializer_class(self):
         if self.request.method == 'POST' or self.request.method == 'PUT':
             return CreateResultsOfStudentSerializer
         return ResultsOfStudentSerializer
+
+
+    def create(self, request, *args, **kwargs):
+        student_id = self.kwargs['student_pk']
+        term = request.data.get('term')
+
+        try:
+            student = Student.objects.get(pk=student_id)
+            class_of_student = student.class_name
+            existing_result = ResultsOfOneYear.objects.get(student=student_id, class_name=class_of_student, term=term)
+            return Response(f'The result for student name : {student.name}, class : {class_of_student} and Term : {term}  already exists', status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        
+        except ResultsOfOneYear.DoesNotExist:
+            data = QueryDict(request.data.urlencode(), mutable=True)
+            data['student'] = student_id
+            serializer = self.get_serializer(data=data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+    
         
 
     
