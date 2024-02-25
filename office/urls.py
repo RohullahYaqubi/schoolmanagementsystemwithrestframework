@@ -16,4 +16,7 @@ attendence_router.register('attendence', views.AttendenceViewSet, basename='atte
 results_router = drf_router.NestedSimpleRouter(routers, 'students', lookup='student' )
 results_router.register('results', views.ResultsOfStudentsViewSet, basename='results')
 
-urlpatterns = routers.urls + attendence_router.urls + results_router.urls
+fees_router = drf_router.NestedSimpleRouter(routers, 'students', lookup='student' )
+fees_router.register('fees', views.FeesOfStudentViewSet, basename='fees')
+
+urlpatterns = routers.urls + attendence_router.urls + results_router.urls + fees_router.urls

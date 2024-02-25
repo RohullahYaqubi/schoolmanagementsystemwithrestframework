@@ -122,8 +122,14 @@ class FeesOfStudents(models.Model):
     date_of_payment = models.DateField(auto_now_add=True)
     payment_status = models.CharField(max_length=1, choices=PAYMENT_STATUS, default=PAYMENT_STATUS_UNPAID)
 
+
+    def save(self, *args, **kwargs):
+        self.class_name = str(self.student.class_name)
+        super().save(*args, **kwargs)
+
+
     def __str__(self) -> str:
-        return self.student
+        return str(self.student)
 
 
 

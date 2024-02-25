@@ -12,8 +12,10 @@ from .serializers import (StudentsSerializer,
                            AttendenceSerializers, 
                            AttendenceCreateSerializers,
                            ResultsOfStudentSerializer,
-                           CreateResultsOfStudentSerializer)
-from .models import Student, NameOfClass, Teacher, Attendence, ResultsOfOneYear
+                           CreateResultsOfStudentSerializer,
+                           CreateFeesSerializers,
+                           FeesOfStudentSerializers)
+from .models import Student, NameOfClass, Teacher, Attendence, ResultsOfOneYear, FeesOfStudents
 
 
 class TeacherViewSet(ModelViewSet):
@@ -131,8 +133,9 @@ class ResultsOfStudentsViewSet(ModelViewSet):
         try:
             student = Student.objects.get(pk=student_id)
             class_of_student = student.class_name
-            existing_result = ResultsOfOneYear.objects.get(student=student_id, class_name=class_of_student, term=term)
-            return Response(f'The result for student name : {student.name}, class : {class_of_student} and Term : {term}  already exists', status=status.HTTP_405_METHOD_NOT_ALLOWED)
+            existing_result = ResultsOfOneYear.objects.get(student=student_id,
+                                                            class_name=class_of_student, term=term)
+            return Response(f'The result for student name : {student.name}, class :{class_of_student} and Term : {term}  already exists', status=status.HTTP_405_METHOD_NOT_ALLOWED)
         
         except ResultsOfOneYear.DoesNotExist:
             data = QueryDict(request.data.urlencode(), mutable=True)
@@ -141,6 +144,53 @@ class ResultsOfStudentsViewSet(ModelViewSet):
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+
+
+class FeesOfStudentViewSet(ModelViewSet):
+    http_method_names = ['get','post', 'patch', 'head', 'options']
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['class_name', 'fees_type']
+
+
+    def get_queryset(self):
+        queryset = FeesOfStudents.objects.filter(student=self.kwargs['student_pk'])
+        return queryset
+    
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST' or self.request.method == 'PATCH':
+            return CreateFeesSerializers
+        return FeesOfStudentSerializers
+    
+
+    def create(self, request, *args, **kwargs):
+        student_id = self.kwargs['student_pk']
+        current_month = timezone.now().month
+        current_year = timezone.now().year
+        fees_type = request.data['fees_type'] 
+        print(fees_type)
+
+        try:
+            if fees_type == 'G' or fees_type == 'FREX' or fees_type == 'SCEX' or fees_type == 'SEK' or fees_type == 'FRK' :
+                existing_fees = FeesOfStudents.objects.get(student=student_id,
+                                                            date_of_payment__year=current_year,
+                                                            fees_type=fees_type)
+            else:
+                 existing_fees = FeesOfStudents.objects.get(student=student_id,
+                                                            date_of_payment__month=current_month,                                                            
+                                                            date_of_payment__year=current_year,
+                                                            fees_type=fees_type)
+                 
+            return Response('fees for this month was already paid', status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        except FeesOfStudents.DoesNotExist:
+
+            data = request.data.copy()
+            data['student'] = student_id
+            serializer = self.get_serializer(data=data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            return Response(serializer.data,status=status.HTTP_201_CREATED)
     
     
         
